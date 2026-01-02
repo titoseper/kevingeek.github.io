@@ -404,7 +404,7 @@
                 <div class="info-box">
                     <strong style="color: #8B0000; font-size: 18px;">📋 KevinGeek</strong><br><br>
                     <strong>Lógica para todas las plataformas:</strong><br>
-                  <em>"El comentario que participa es el que etiqueto a un amigo y agrago algun otro texto"</em><br><br>
+                  <em>"El comentario que participa es el que etiquetó a un amigo y agregó algún otro texto complementario"</em><br><br>
                     
                     <div class="platform-info">
                         <div class="platform-card instagram">
@@ -627,6 +627,7 @@
             let columnaVerificacion = -1;
             
             // 1. DETECTAR INSTAGRAM (buscar x1i10hfl)
+            if (!plataforma) {
             for (let i = 0; i < encabezadosLower.length; i++) {
                 if (encabezadosLower[i].includes('comentario')) {
                     plataforma = 'Instagram';
@@ -634,6 +635,7 @@
                     break;
                 }
             }
+        }
             
             // 2. DETECTAR TIKTOK (buscar TUXText 7)
             if (!plataforma) {
@@ -964,6 +966,7 @@
     </script>
 </body>
 </html>
+
 
 
 
