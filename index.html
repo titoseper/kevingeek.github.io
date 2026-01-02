@@ -70,6 +70,15 @@
             margin: 20px 0;
         }
         
+        input[type="file"] {
+            padding: 10px;
+            background: #f8f9ff;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 100%;
+            max-width: 300px;
+        }
+        
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -81,6 +90,7 @@
             transition: transform 0.3s, box-shadow 0.3s;
             display: inline-block;
             text-decoration: none;
+            margin-top: 10px;
         }
         
         .btn:hover {
@@ -174,27 +184,35 @@
             border-radius: 5px;
             margin: 20px 0;
         }
+        
+        .file-name {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🎬 Sorteo de Comentarios</h1>
-            <p>Sube tu archivo CSV con los comentarios y realiza un sorteo aleatorio</p>
+            <p>Sube tu archivo CSV y realiza un sorteo aleatorio entre los participantes</p>
         </div>
         
         <div class="content">
             <div class="upload-section">
                 <div class="upload-icon">📁</div>
                 <h2>Subir Archivo CSV</h2>
-                <p>El archivo debe contener los comentarios del video (los nombres están en la clase _ap3a)</p>
+                <p>El archivo debe contener los comentarios del video</p>
+                <p><small>Los nombres se buscan en columnas que contengan "_ap3a", "nombre" o "user"</small></p>
                 
                 <div class="file-input">
-                    <input type="file" id="csvFile" accept=".csv" class="btn">
+                    <input type="file" id="csvFile" accept=".csv">
+                    <div class="file-name" id="fileName"></div>
                 </div>
                 
                 <button id="uploadBtn" class="btn" onclick="uploadFile()">
-                    Subir y Procesar Archivo
+                    📤 Subir y Procesar Archivo
                 </button>
                 
                 <div class="loading" id="uploadLoading">
@@ -210,7 +228,7 @@
                 
                 <div id="participantsInfo">
                     <h3>📋 Lista de Participantes</h3>
-                    <p>Total: <span id="totalCount">0</span> participantes</p>
+                    <p>Total: <span id="totalCount">0</span> participantes encontrados</p>
                     
                     <div class="participants-list" id="participantsList">
                         <!-- Los nombres se cargarán aquí -->
@@ -219,13 +237,13 @@
                 
                 <div style="text-align: center; margin: 30px 0;">
                     <button id="sorteoBtn" class="btn" onclick="realizarSorteo()">
-                        🎉 Realizar Sorteo
+                        🎉 Realizar Sorteo Aleatorio
                     </button>
                 </div>
                 
                 <div class="loading" id="sorteoLoading">
                     <div class="spinner"></div>
-                    <p>Realizando sorteo...</p>
+                    <p>Seleccionando ganador...</p>
                 </div>
             </div>
             
@@ -234,7 +252,7 @@
                 <div class="winner-name" id="winnerName"></div>
                 <p>De un total de <span id="winnerTotal">0</span> participantes</p>
                 <button class="btn" onclick="location.reload()" style="margin-top: 20px;">
-                    🔄 Nuevo Sorteo
+                    🔄 Hacer Otro Sorteo
                 </button>
             </div>
         </div>
@@ -243,25 +261,27 @@
     <script>
         let participantes = [];
         
+        // Mostrar nombre del archivo seleccionado
+        document.getElementById('csvFile').addEventListener('change', function(e) {
+            const fileName = this.files[0] ? this.files[0].name : 'No se seleccionó archivo';
+            document.getElementById('fileName').textContent = `Archivo: ${fileName}`;
+        });
+        
         function uploadFile() {
             const fileInput = document.getElementById('csvFile');
             const uploadBtn = document.getElementById('uploadBtn');
             const loading = document.getElementById('uploadLoading');
             const errorDiv = document.getElementById('uploadError');
-            const successDiv = document.getElementById('uploadSuccess');
             
             if (!fileInput.files.length) {
-                errorDiv.textContent = 'Por favor, selecciona un archivo CSV';
-                errorDiv.style.display = 'block';
+                showError('Por favor, selecciona un archivo CSV');
                 return;
             }
             
             const file = fileInput.files[0];
             
-            // Validar extensión
             if (!file.name.toLowerCase().endsWith('.csv')) {
-                errorDiv.textContent = 'Solo se permiten archivos CSV';
-                errorDiv.style.display = 'block';
+                showError('Solo se permiten archivos CSV');
                 return;
             }
             
@@ -270,102 +290,193 @@
             errorDiv.style.display = 'none';
             uploadBtn.disabled = true;
             
-            const formData = new FormData();
-            formData.append('file', file);
+            // Leer el archivo CSV localmente
+            const reader = new FileReader();
             
-            fetch('/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                loading.style.display = 'none';
-                
-                if (data.error) {
-                    errorDiv.textContent = data.error;
-                    errorDiv.style.display = 'block';
+            reader.onload = function(e) {
+                try {
+                    const contenido = e.target.result;
+                    participantes = procesarCSVLocalmente(contenido);
+                    
+                    if (participantes.length === 0) {
+                        showError('No se encontraron nombres en el archivo CSV. Asegúrate de que haya una columna con nombres.');
+                        loading.style.display = 'none';
+                        uploadBtn.disabled = false;
+                        return;
+                    }
+                    
+                    mostrarResultados(participantes);
+                    loading.style.display = 'none';
                     uploadBtn.disabled = false;
-                    return;
+                    
+                } catch (error) {
+                    showError('Error al leer el archivo: ' + error.message);
+                    loading.style.display = 'none';
+                    uploadBtn.disabled = false;
                 }
-                
-                // Guardar participantes
-                participantes = data.nombres;
-                
-                // Mostrar resultados
-                document.getElementById('resultsSection').style.display = 'block';
-                document.getElementById('totalCount').textContent = data.total_participantes;
-                document.getElementById('uploadSuccess').textContent = data.message;
-                document.getElementById('uploadSuccess').style.display = 'block';
-                
-                // Mostrar lista de participantes (solo primeros 50)
-                const participantsList = document.getElementById('participantsList');
-                participantsList.innerHTML = '';
-                
-                const displayCount = Math.min(50, participantes.length);
-                for (let i = 0; i < displayCount; i++) {
-                    const div = document.createElement('div');
-                    div.className = 'participant-item';
-                    div.textContent = `${i + 1}. ${participantes[i]}`;
-                    participantsList.appendChild(div);
-                }
-                
-                if (participantes.length > 50) {
-                    const div = document.createElement('div');
-                    div.className = 'participant-item';
-                    div.textContent = `... y ${participantes.length - 50} participantes más`;
-                    div.style.fontStyle = 'italic';
-                    participantsList.appendChild(div);
-                }
-                
-                uploadBtn.disabled = false;
-            })
-            .catch(error => {
+            };
+            
+            reader.onerror = function() {
+                showError('Error al leer el archivo');
                 loading.style.display = 'none';
-                errorDiv.textContent = 'Error al subir el archivo: ' + error.message;
-                errorDiv.style.display = 'block';
                 uploadBtn.disabled = false;
-            });
+            };
+            
+            reader.readAsText(file, 'UTF-8');
+        }
+        
+        function procesarCSVLocalmente(csvText) {
+            const nombres = [];
+            const lineas = csvText.split('\n').filter(linea => linea.trim() !== '');
+            
+            if (lineas.length === 0) return nombres;
+            
+            // Encontrar encabezados
+            const encabezados = lineas[0].split(',').map(h => h.trim().toLowerCase());
+            let columnaNombre = -1;
+            
+            // Buscar columna con patrones comunes de nombres
+            const patrones = ['_ap3a', 'nombre', 'user', 'username', 'author', 'comentario', 'comment'];
+            
+            for (let i = 0; i < encabezados.length; i++) {
+                for (const patron of patrones) {
+                    if (encabezados[i].includes(patron)) {
+                        columnaNombre = i;
+                        break;
+                    }
+                }
+                if (columnaNombre !== -1) break;
+            }
+            
+            // Si no encontramos, usar la primera columna que parezca contener nombres
+            if (columnaNombre === -1) {
+                // Buscar en las primeras filas para deducir
+                for (let i = 0; i < Math.min(5, lineas.length); i++) {
+                    const columnas = lineas[i].split(',');
+                    for (let j = 0; j < columnas.length; j++) {
+                        const valor = columnas[j].trim();
+                        if (valor && valor.length > 1 && isNaN(valor) && !valor.includes('@')) {
+                            columnaNombre = j;
+                            break;
+                        }
+                    }
+                    if (columnaNombre !== -1) break;
+                }
+            }
+            
+            // Si aún no encontramos, usar primera columna
+            if (columnaNombre === -1) columnaNombre = 0;
+            
+            // Procesar cada línea (empezando desde la segunda)
+            for (let i = 1; i < lineas.length; i++) {
+                try {
+                    // Manejar comas dentro de comillas
+                    const columnas = parseCSVLine(lineas[i]);
+                    if (columnas[columnaNombre]) {
+                        const nombre = columnas[columnaNombre].trim().replace(/"/g, '');
+                        if (nombre && nombre.length > 1) {
+                            nombres.push(nombre);
+                        }
+                    }
+                } catch (e) {
+                    console.log('Error en línea', i, e);
+                }
+            }
+            
+            // Eliminar duplicados y ordenar alfabéticamente
+            return [...new Set(nombres)].sort((a, b) => a.localeCompare(b));
+        }
+        
+        function parseCSVLine(line) {
+            // Manejo simple de CSV con comas dentro de comillas
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1];
+                
+                if (char === '"' && !inQuotes) {
+                    inQuotes = true;
+                } else if (char === '"' && inQuotes && nextChar === '"') {
+                    current += '"';
+                    i++; // Saltar la siguiente comilla
+                } else if (char === '"' && inQuotes) {
+                    inQuotes = false;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current);
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            result.push(current);
+            return result;
+        }
+        
+        function mostrarResultados(nombres) {
+            document.getElementById('resultsSection').style.display = 'block';
+            document.getElementById('totalCount').textContent = nombres.length;
+            document.getElementById('uploadSuccess').textContent = 
+                `✅ Se encontraron ${nombres.length} participantes únicos`;
+            document.getElementById('uploadSuccess').style.display = 'block';
+            
+            // Mostrar lista
+            const participantsList = document.getElementById('participantsList');
+            participantsList.innerHTML = '';
+            
+            const displayCount = Math.min(50, nombres.length);
+            for (let i = 0; i < displayCount; i++) {
+                const div = document.createElement('div');
+                div.className = 'participant-item';
+                div.textContent = `${i + 1}. ${nombres[i]}`;
+                participantsList.appendChild(div);
+            }
+            
+            if (nombres.length > 50) {
+                const div = document.createElement('div');
+                div.className = 'participant-item';
+                div.textContent = `... y ${nombres.length - 50} participantes más`;
+                div.style.fontStyle = 'italic';
+                div.style.color = '#666';
+                participantsList.appendChild(div);
+            }
+            
+            // Desplazar hacia la sección de resultados
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
         }
         
         function realizarSorteo() {
-            const sorteoBtn = document.getElementById('sorteoBtn');
-            const loading = document.getElementById('sorteoLoading');
-            
             if (!participantes.length) {
                 alert('No hay participantes para el sorteo');
                 return;
             }
             
+            const sorteoBtn = document.getElementById('sorteoBtn');
+            const loading = document.getElementById('sorteoLoading');
+            
             // Mostrar loading
             loading.style.display = 'block';
             sorteoBtn.disabled = true;
             
-            // Enviar participantes al servidor para el sorteo
-            fetch('/sorteo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ nombres: participantes })
-            })
-            .then(response => response.json())
-            .then(data => {
-                loading.style.display = 'none';
-                sorteoBtn.disabled = false;
-                
-                if (data.error) {
-                    alert('Error: ' + data.error);
-                    return;
+            // Simular sorteo con delay dramático
+            let contador = 3;
+            const intervalo = setInterval(() => {
+                if (contador > 0) {
+                    document.querySelector('#sorteoLoading p').textContent = 
+                        `Seleccionando ganador... ${contador}`;
+                    contador--;
+                } else {
+                    clearInterval(intervalo);
+                    
+                    const ganador = participantes[Math.floor(Math.random() * participantes.length)];
+                    loading.style.display = 'none';
+                    sorteoBtn.disabled = false;
+                    mostrarGanador(ganador, participantes.length);
                 }
-                
-                // Mostrar ganador con efecto dramático
-                mostrarGanador(data.ganador, data.total_participantes);
-            })
-            .catch(error => {
-                loading.style.display = 'none';
-                sorteoBtn.disabled = false;
-                alert('Error al realizar el sorteo: ' + error.message);
-            });
+            }, 500);
         }
         
         function mostrarGanador(ganador, total) {
@@ -381,18 +492,21 @@
             winnerTotal.textContent = total;
             winnerSection.style.display = 'block';
             
-            // Efecto de confeti visual
+            // Desplazar hacia el ganador
+            winnerSection.scrollIntoView({ behavior: 'smooth' });
+            
+            // Efecto de confeti
             crearConfeti();
         }
         
         function crearConfeti() {
             // Efecto simple de confeti
-            for (let i = 0; i < 50; i++) {
+            for (let i = 0; i < 100; i++) {
                 setTimeout(() => {
                     const confetti = document.createElement('div');
                     confetti.style.position = 'fixed';
-                    confetti.style.width = '10px';
-                    confetti.style.height = '10px';
+                    confetti.style.width = Math.random() * 10 + 5 + 'px';
+                    confetti.style.height = Math.random() * 10 + 5 + 'px';
                     confetti.style.background = getRandomColor();
                     confetti.style.borderRadius = '50%';
                     confetti.style.top = '0';
@@ -410,13 +524,19 @@
                     });
                     
                     animation.onfinish = () => confetti.remove();
-                }, i * 100);
+                }, i * 30);
             }
         }
         
         function getRandomColor() {
-            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff9900', '#ff66cc'];
             return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        function showError(mensaje) {
+            const errorDiv = document.getElementById('uploadError');
+            errorDiv.textContent = mensaje;
+            errorDiv.style.display = 'block';
         }
         
         // Permitir arrastrar y soltar archivos
@@ -442,10 +562,12 @@
             
             function highlight() {
                 uploadSection.style.background = '#f0f4ff';
+                uploadSection.style.borderColor = '#4a6ee0';
             }
             
             function unhighlight() {
                 uploadSection.style.background = '';
+                uploadSection.style.borderColor = '#667eea';
             }
             
             uploadSection.addEventListener('drop', handleDrop, false);
@@ -454,15 +576,19 @@
                 const dt = e.dataTransfer;
                 const files = dt.files;
                 
-                if (files.length && files[0].name.toLowerCase().endsWith('.csv')) {
-                    document.getElementById('csvFile').files = files;
-                    uploadFile();
-                } else {
-                    document.getElementById('uploadError').textContent = 'Solo se permiten archivos CSV';
-                    document.getElementById('uploadError').style.display = 'block';
+                if (files.length) {
+                    const file = files[0];
+                    if (file.name.toLowerCase().endsWith('.csv')) {
+                        document.getElementById('csvFile').files = files;
+                        document.getElementById('fileName').textContent = `Archivo: ${file.name}`;
+                        uploadFile();
+                    } else {
+                        showError('Solo se permiten archivos CSV');
+                    }
                 }
             }
         });
     </script>
 </body>
 </html>
+         
