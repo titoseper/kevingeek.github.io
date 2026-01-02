@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorteo de Comentarios - Red Dead Redemption 22</title>
+    <title>Sorteo de Comentarios - Red Dead Redemption 2</title>
     <style>
         * {
             margin: 0;
@@ -13,34 +13,42 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%);
             min-height: 100vh;
             padding: 20px;
         }
         
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
             overflow: hidden;
+            border: 5px solid #DAA520;
         }
         
         .header {
-            background: linear-gradient(135deg, #4a6ee0 0%, #6a11cb 100%);
-            color: white;
-            padding: 30px;
+            background: linear-gradient(135deg, #8B0000 0%, #B22222 100%);
+            color: #FFD700;
+            padding: 40px;
             text-align: center;
+            border-bottom: 8px solid #DAA520;
         }
         
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 8px rgba(0,0,0,0.5);
+            font-family: 'Georgia', serif;
+            letter-spacing: 1px;
         }
         
         .header p {
-            opacity: 0.9;
+            font-size: 1.3em;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
         }
         
         .content {
@@ -48,99 +56,151 @@
         }
         
         .upload-section {
-            border: 2px dashed #667eea;
-            border-radius: 10px;
-            padding: 40px;
+            border: 4px dashed #8B0000;
+            border-radius: 20px;
+            padding: 50px;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             transition: all 0.3s;
+            background: rgba(255, 248, 225, 0.1);
         }
         
         .upload-section:hover {
-            background: #f8f9ff;
+            background: rgba(255, 248, 225, 0.2);
+            border-color: #FFD700;
         }
         
         .upload-icon {
-            font-size: 48px;
-            color: #667eea;
-            margin-bottom: 20px;
+            font-size: 80px;
+            color: #8B0000;
+            margin-bottom: 25px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         
         .file-input {
-            margin: 20px 0;
+            margin: 30px 0;
         }
         
         input[type="file"] {
-            padding: 10px;
-            background: #f8f9ff;
-            border-radius: 5px;
-            border: 1px solid #ddd;
+            padding: 15px;
+            background: #fff8e1;
+            border-radius: 10px;
+            border: 3px solid #DAA520;
             width: 100%;
-            max-width: 300px;
+            max-width: 500px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        input[type="file"]:hover {
+            background: #ffecb3;
+            transform: scale(1.02);
         }
         
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-size: 16px;
+            background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%);
+            color: #FFD700;
+            border: 4px solid #DAA520;
+            padding: 18px 50px;
+            border-radius: 35px;
+            font-size: 20px;
             cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: all 0.3s;
             display: inline-block;
             text-decoration: none;
-            margin-top: 10px;
+            margin-top: 20px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            box-shadow: 0 6px 15px rgba(139, 0, 0, 0.4);
+            letter-spacing: 1px;
         }
         
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 25px rgba(139, 0, 0, 0.6);
+            background: linear-gradient(135deg, #B22222 0%, #8B0000 100%);
         }
         
         .btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
         .results {
             display: none;
-            margin-top: 30px;
-            padding: 20px;
-            background: #f8f9ff;
-            border-radius: 10px;
+            margin-top: 40px;
+            padding: 30px;
+            background: #fff8e1;
+            border-radius: 20px;
+            border: 4px solid #8B0000;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
         
         .winner-section {
             text-align: center;
-            padding: 30px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border-radius: 10px;
-            margin: 20px 0;
+            padding: 50px;
+            background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%);
+            color: #FFD700;
+            border-radius: 20px;
+            margin: 30px 0;
             display: none;
+            border: 8px solid #FFD700;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            animation: winnerAppear 1s ease-out;
+        }
+        
+        @keyframes winnerAppear {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
         
         .winner-name {
-            font-size: 2.5em;
+            font-size: 4em;
             font-weight: bold;
-            margin: 20px 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin: 40px 0;
+            text-shadow: 5px 5px 10px rgba(0,0,0,0.6);
+            color: #FFD700;
+            font-family: 'Georgia', serif;
+            animation: winnerPulse 2s infinite;
+        }
+        
+        @keyframes winnerPulse {
+            0% { transform: scale(1); text-shadow: 5px 5px 10px rgba(0,0,0,0.6); }
+            50% { transform: scale(1.05); text-shadow: 8px 8px 15px rgba(0,0,0,0.8); }
+            100% { transform: scale(1); text-shadow: 5px 5px 10px rgba(0,0,0,0.6); }
         }
         
         .participants-list {
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
             background: white;
-            border-radius: 5px;
-            padding: 15px;
-            margin-top: 20px;
-            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+            border: 2px solid #DAA520;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
         }
         
         .participant-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
+            padding: 12px 15px;
+            border-bottom: 2px solid #f0f0f0;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        .participant-item:hover {
+            background: #fff8e1;
+            transform: translateX(5px);
+            border-left: 4px solid #8B0000;
         }
         
         .participant-item:last-child {
@@ -150,17 +210,18 @@
         .loading {
             display: none;
             text-align: center;
-            margin: 20px 0;
+            margin: 30px 0;
         }
         
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #8B0000;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.5s linear infinite;
             margin: 0 auto;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.3);
         }
         
         @keyframes spin {
@@ -169,63 +230,224 @@
         }
         
         .error {
-            color: #dc3545;
-            background: #f8d7da;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
+            color: #ff3333;
+            background: rgba(255, 220, 220, 0.9);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 20px 0;
             display: none;
+            border-left: 6px solid #ff3333;
+            font-size: 16px;
+            font-weight: bold;
         }
         
         .success {
-            color: #155724;
-            background: #d4edda;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
+            color: #2e7d32;
+            background: rgba(220, 255, 220, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+            border-left: 6px solid #2e7d32;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
         }
         
         .file-name {
-            margin-top: 10px;
-            color: #666;
-            font-size: 14px;
+            margin-top: 15px;
+            color: #8B0000;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px;
+            background: rgba(255, 248, 225, 0.7);
+            border-radius: 8px;
+            display: inline-block;
         }
         
         .info-box {
-            background: #e8f4fd;
-            border-left: 4px solid #2196F3;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 4px;
-            font-size: 14px;
+            background: rgba(255, 248, 225, 0.8);
+            border-left: 6px solid #DAA520;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 12px;
+            font-size: 16px;
+            text-align: left;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
+        
+        .platform-info {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            gap: 15px;
+        }
+        
+        .platform-card {
+            background: white;
+            border: 3px solid;
+            border-radius: 12px;
+            padding: 15px;
+            width: 250px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .platform-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .platform-card.instagram {
+            border-color: #E4405F;
+        }
+        
+        .platform-card.tiktok {
+            border-color: #000000;
+        }
+        
+        .platform-card.facebook {
+            border-color: #1877F2;
+        }
+        
+        .platform-card h4 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        
+        .platform-card p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .detected-platform {
+            background: linear-gradient(135deg, #8B0000, #B22222);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            border: 3px solid #FFD700;
+            display: none;
+        }
+        
+        .csv-preview {
+            margin-top: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 250px;
+            overflow-y: auto;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            border: 2px solid #ddd;
+            display: none;
+        }
+        
+        .stats-box {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(139, 0, 0, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #8B0000;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #8B0000;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .format-legend {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+        
+        .legend-instagram { background: #E4405F; color: white; }
+        .legend-tiktok { background: #000000; color: white; }
+        .legend-facebook { background: #1877F2; color: white; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎬 Sorteo de Comentarios - Red Dead Redemption 2</h1>
-            <p>Solo participa un comentario por persona</p>
+            <h1>🎮 SORTEO RED DEAD REDEMPTION 2</h1>
+            <p>Sistema inteligente para extraer participantes de Instagram, TikTok y Facebook</p>
         </div>
         
         <div class="content">
             <div class="upload-section">
-                <div class="upload-icon">📁</div>
-                <h2>Subir Archivo CSV</h2>
+                <div class="upload-icon">📊</div>
+                <h2>📁 SUBIR ARCHIVO CSV</h2>
                 
-                             
+                <div class="info-box">
+                    <strong style="color: #8B0000; font-size: 18px;">📋 ¿CÓMO FUNCIONA?</strong><br><br>
+                    <strong>Lógica para todas las plataformas:</strong><br>
+                    <em>"SI la columna de verificación TIENE DATOS → obtener la PRIMERA COLUMNA"</em><br><br>
+                    
+                    <div class="platform-info">
+                        <div class="platform-card instagram">
+                            <h4><span class="format-legend legend-instagram">INSTAGRAM</span></h4>
+                            <p><strong>Verificar:</strong> columna "x1i10hfl"</p>
+                            <p><strong>Obtener:</strong> PRIMERA columna</p>
+                        </div>
+                        
+                        <div class="platform-card tiktok">
+                            <h4><span class="format-legend legend-tiktok">TIKTOK</span></h4>
+                            <p><strong>Verificar:</strong> columna "TUXText 7"</p>
+                            <p><strong>Obtener:</strong> PRIMERA columna</p>
+                        </div>
+                        
+                        <div class="platform-card facebook">
+                            <h4><span class="format-legend legend-facebook">FACEBOOK</span></h4>
+                            <p><strong>Verificar:</strong> columna "xjp7ctv"</p>
+                            <p><strong>Obtener:</strong> PRIMERA columna</p>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="file-input">
                     <input type="file" id="csvFile" accept=".csv">
                     <div class="file-name" id="fileName"></div>
                 </div>
                 
+                <div id="detectedPlatform" class="detected-platform" style="display: none;">
+                    🔍 <span id="platformType">Plataforma detectada</span>
+                </div>
+                
+                <div id="csvPreview" class="csv-preview">
+                    <strong>Vista previa del CSV:</strong>
+                    <div id="previewContent"></div>
+                </div>
+                
                 <button id="uploadBtn" class="btn" onclick="uploadFile()">
-                    📤 Subir y Procesar Archivo
+                    ⚡ PROCESAR CSV Y EXTRAER PARTICIPANTES
                 </button>
                 
                 <div class="loading" id="uploadLoading">
                     <div class="spinner"></div>
-                    <p>Procesando archivo...</p>
+                    <p style="font-size: 18px; color: #8B0000; margin-top: 15px;">Analizando archivo CSV...</p>
                 </div>
                 
                 <div class="error" id="uploadError"></div>
@@ -234,33 +456,48 @@
             <div class="results" id="resultsSection">
                 <div class="success" id="uploadSuccess"></div>
                 
+                <div class="stats-box">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalCount">0</div>
+                        <div class="stat-label">PARTICIPANTES</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="validRows">0</div>
+                        <div class="stat-label">FILAS VÁLIDAS</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="platformUsed">-</div>
+                        <div class="stat-label">PLATAFORMA</div>
+                    </div>
+                </div>
+                
                 <div id="participantsInfo">
-                    <h3>📋 Lista de Participantes</h3>
-                    <p>Total: <span id="totalCount">0</span> participantes encontrados</p>
+                    <h3 style="color: #8B0000; font-size: 24px; margin-bottom: 20px;">📋 LISTA DE PARTICIPANTES</h3>
                     
                     <div class="participants-list" id="participantsList">
                         <!-- Los nombres se cargarán aquí -->
                     </div>
                 </div>
                 
-                <div style="text-align: center; margin: 30px 0;">
-                    <button id="sorteoBtn" class="btn" onclick="realizarSorteo()">
-                        🎉 Realizar Sorteo Aleatorio
+                <div style="text-align: center; margin: 40px 0;">
+                    <button id="sorteoBtn" class="btn" onclick="realizarSorteo()" style="padding: 20px 60px; font-size: 22px;">
+                        🎲 REALIZAR SORTEO ALEATORIO
                     </button>
                 </div>
                 
                 <div class="loading" id="sorteoLoading">
                     <div class="spinner"></div>
-                    <p>Seleccionando ganador...</p>
+                    <p style="font-size: 20px; color: #8B0000; margin-top: 20px;">🎯 SELECCIONANDO GANADOR...</p>
                 </div>
             </div>
             
             <div class="winner-section" id="winnerSection">
-                <h2>🎊 ¡GANADOR DEL SORTEO! 🎊</h2>
+                <h2 style="font-size: 2.5em; text-shadow: 3px 3px 6px rgba(0,0,0,0.5);">🏆 ¡GANADOR DEL SORTEO! 🏆</h2>
                 <div class="winner-name" id="winnerName"></div>
-                <p>De un total de <span id="winnerTotal">0</span> participantes</p>
-                <button class="btn" onclick="location.reload()" style="margin-top: 20px;">
-                    🔄 Hacer Otro Sorteo
+                <p style="font-size: 1.5em; margin: 20px 0;">De un total de <strong style="color: #FFD700;"><span id="winnerTotal">0</span></strong> participantes</p>
+                <p style="font-size: 1.2em; opacity: 0.9;">Plataforma: <span id="winnerPlatform" style="font-weight: bold;"></span></p>
+                <button class="btn" onclick="location.reload()" style="margin-top: 30px; background: #2e7d32; font-size: 18px;">
+                    🔄 HACER OTRO SORTEO
                 </button>
             </div>
         </div>
@@ -268,12 +505,42 @@
 
     <script>
         let participantes = [];
+        let plataformaDetectada = '';
+        let estadisticas = {
+            totalFilas: 0,
+            filasValidas: 0,
+            columnasEncontradas: 0
+        };
         
         // Mostrar nombre del archivo seleccionado
         document.getElementById('csvFile').addEventListener('change', function(e) {
             const fileName = this.files[0] ? this.files[0].name : 'No se seleccionó archivo';
-            document.getElementById('fileName').textContent = `Archivo: ${fileName}`;
+            document.getElementById('fileName').textContent = `📄 Archivo: ${fileName}`;
+            
+            // Mostrar vista previa
+            if (this.files[0]) {
+                mostrarVistaPrevia(this.files[0]);
+            }
         });
+        
+        function mostrarVistaPrevia(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const contenido = e.target.result;
+                const lineas = contenido.split('\n').slice(0, 6); // Mostrar solo primeras 6 líneas
+                
+                document.getElementById('previewContent').innerHTML = lineas.map(line => {
+                    // Resaltar columnas
+                    return line.replace(/,/g, '</span><span style="color: #8B0000;">,</span><span>')
+                               .replace(/"/g, '<span style="color: #2e7d32;">"</span>');
+                }).join('<br>');
+                
+                document.getElementById('csvPreview').style.display = 'block';
+            };
+            
+            reader.readAsText(file, 'UTF-8');
+        }
         
         function uploadFile() {
             const fileInput = document.getElementById('csvFile');
@@ -282,14 +549,14 @@
             const errorDiv = document.getElementById('uploadError');
             
             if (!fileInput.files.length) {
-                showError('Por favor, selecciona un archivo CSV');
+                showError('❌ Por favor, selecciona un archivo CSV');
                 return;
             }
             
             const file = fileInput.files[0];
             
             if (!file.name.toLowerCase().endsWith('.csv')) {
-                showError('Solo se permiten archivos CSV');
+                showError('❌ Solo se permiten archivos CSV');
                 return;
             }
             
@@ -304,28 +571,37 @@
             reader.onload = function(e) {
                 try {
                     const contenido = e.target.result;
-                    participantes = procesarCSVSimple(contenido);
+                    const resultado = procesarCSVUniversal(contenido);
+                    
+                    participantes = resultado.participantes;
+                    plataformaDetectada = resultado.plataforma;
+                    estadisticas = resultado.estadisticas;
                     
                     if (participantes.length === 0) {
-                        showError('No se encontraron datos en las columnas especificadas.');
+                        showError('⚠️ No se encontraron participantes válidos en el archivo CSV.');
                         loading.style.display = 'none';
                         uploadBtn.disabled = false;
                         return;
                     }
                     
+                    // Mostrar estadísticas
+                    mostrarEstadisticas(estadisticas, plataformaDetectada);
+                    
+                    // Mostrar resultados
                     mostrarResultados(participantes);
                     loading.style.display = 'none';
                     uploadBtn.disabled = false;
                     
                 } catch (error) {
-                    showError('Error al procesar el archivo: ' + error.message);
+                    showError('❌ Error al procesar el archivo: ' + error.message);
                     loading.style.display = 'none';
                     uploadBtn.disabled = false;
+                    console.error('Error:', error);
                 }
             };
             
             reader.onerror = function() {
-                showError('Error al leer el archivo');
+                showError('❌ Error al leer el archivo');
                 loading.style.display = 'none';
                 uploadBtn.disabled = false;
             };
@@ -333,95 +609,131 @@
             reader.readAsText(file, 'UTF-8');
         }
         
-        function procesarCSVSimple(csvText) {
-            const participantesSet = new Set(); // Para evitar duplicados
+        function procesarCSVUniversal(csvText) {
             const lineas = csvText.split('\n').filter(linea => linea.trim() !== '');
             
-            if (lineas.length === 0) return [];
+            if (lineas.length < 2) {
+                return { 
+                    participantes: [], 
+                    plataforma: 'CSV vacío o sin datos',
+                    estadisticas: { totalFilas: 0, filasValidas: 0, columnasEncontradas: 0 }
+                };
+            }
             
             // Obtener encabezados
             const encabezados = parseCSVLine(lineas[0]).map(h => h.trim());
+            const encabezadosLower = encabezados.map(h => h.toLowerCase());
             
-            // Buscar índices de las 3 columnas específicas
-            const columnasBuscadas = [
-                'x1i10hfl',
-                'css-j43fir-5e6d46e3--StyledUserLinkContent',
-                'xjp7ctv'
-            ];
+            console.log('Encabezados encontrados:', encabezados);
             
-            const indicesEncontrados = [];
+            // DETECTAR PLATAFORMA
+            let plataforma = '';
+            let columnaVerificacion = -1;
             
-            // Buscar cada columna en los encabezados (búsqueda exacta o parcial)
-            for (const columnaBuscada of columnasBuscadas) {
-                for (let i = 0; i < encabezados.length; i++) {
-                    if (encabezados[i].includes(columnaBuscada)) {
-                        indicesEncontrados.push(i);
-                        console.log(`Encontrada columna: ${columnaBuscada} en índice ${i}`);
+            // 1. DETECTAR INSTAGRAM (buscar x1i10hfl)
+            for (let i = 0; i < encabezadosLower.length; i++) {
+                if (encabezadosLower[i].includes('x1i10hfl')) {
+                    plataforma = 'Instagram';
+                    columnaVerificacion = i;
+                    break;
+                }
+            }
+            
+            // 2. DETECTAR TIKTOK (buscar TUXText 7)
+            if (!plataforma) {
+                for (let i = 0; i < encabezadosLower.length; i++) {
+                    if (encabezadosLower[i].includes('tuxtext') || 
+                        encabezadosLower[i].includes('tux text')) {
+                        plataforma = 'TikTok';
+                        columnaVerificacion = i;
                         break;
                     }
                 }
             }
             
-            // Si no encontramos ninguna columna, buscar de forma más flexible
-            if (indicesEncontrados.length === 0) {
-                // Buscar cualquier columna que contenga partes de los nombres
-                for (let i = 0; i < encabezados.length; i++) {
-                    const encabezado = encabezados[i].toLowerCase();
-                    if (encabezado.includes('x1i10hfl') || 
-                        encabezado.includes('css-j43fir') || 
-                        encabezado.includes('xjp7ctv') ||
-                        encabezado.includes('user') ||
-                        encabezado.includes('nombre') ||
-                        encabezado.includes('username')) {
-                        indicesEncontrados.push(i);
-                        console.log(`Encontrada columna alternativa: ${encabezados[i]} en índice ${i}`);
+            // 3. DETECTAR FACEBOOK (buscar xjp7ctv)
+            if (!plataforma) {
+                for (let i = 0; i < encabezadosLower.length; i++) {
+                    if (encabezadosLower[i].includes('xjp7ctv')) {
+                        plataforma = 'Facebook';
+                        columnaVerificacion = i;
+                        break;
                     }
                 }
             }
             
-            // Ordenar índices para procesar en orden
-            indicesEncontrados.sort((a, b) => a - b);
-            
-            if (indicesEncontrados.length === 0) {
-                console.log('No se encontraron las columnas especificadas');
-                return [];
+            // 4. PLATAFORMA DESCONOCIDA (usar primera columna como verificación)
+            if (!plataforma) {
+                plataforma = 'CSV Genérico';
+                columnaVerificacion = 0; // Usar primera columna como verificación
             }
             
-            // Procesar cada línea del CSV (empezando desde la fila 1)
+            console.log(`Plataforma detectada: ${plataforma}, Columna verificación: ${columnaVerificacion}`);
+            
+            // Mostrar plataforma detectada
+            document.getElementById('detectedPlatform').style.display = 'block';
+            document.getElementById('platformType').textContent = `Plataforma detectada: ${plataforma}`;
+            
+            // Procesar todas las líneas para extraer participantes
+            const participantesSet = new Set();
+            let filasValidas = 0;
+            
             for (let i = 1; i < lineas.length; i++) {
                 try {
                     const columnas = parseCSVLine(lineas[i]);
                     
-                    // Revisar cada columna buscada
-                    for (const indice of indicesEncontrados) {
-                        if (indice < columnas.length) {
-                            const valor = columnas[indice] ? columnas[indice].trim() : '';
+                    // Verificar si la columna de verificación tiene datos
+                    const tieneDatosVerificacion = columnaVerificacion < columnas.length && 
+                                                  columnas[columnaVerificacion] && 
+                                                  columnas[columnaVerificacion].trim() !== '';
+                    
+                    if (tieneDatosVerificacion) {
+                        // OBTENER LA PRIMERA COLUMNA (siempre es lo que queremos)
+                        if (columnas.length > 0 && columnas[0]) {
+                            let valor = columnas[0].trim();
                             
-                            if (valor !== '' && valor.length > 1) {
-                                // Limpiar el valor (remover comillas extras, espacios)
-                                const nombreLimpio = valor
-                                    .replace(/^["']|["']$/g, '') // Remover comillas al inicio/fin
+                            // Limpiar el valor
+                            if (valor) {
+                                valor = valor
+                                    .replace(/^["']|["']$/g, '') // Remover comillas
                                     .replace(/^\s+|\s+$/g, '')   // Remover espacios
-                                    .replace(/^@/, '')           // Remover @ si existe al inicio
+                                    .replace(/^@/, '')           // Remover @
+                                    .replace(/<[^>]*>/g, '')     // Remover HTML tags
                                     .slice(0, 100);              // Limitar longitud
                                 
-                                if (nombreLimpio && nombreLimpio.length > 0) {
-                                    participantesSet.add(nombreLimpio);
-                                    // Solo tomar el primer valor encontrado por fila
-                                    break;
+                                // Solo agregar si no está vacío y es un nombre válido
+                                if (valor && valor.length > 1 && 
+                                    !valor.match(/^\d+$/) && 
+                                    !valor.toLowerCase().includes('http')) {
+                                    
+                                    participantesSet.add(valor);
+                                    filasValidas++;
                                 }
                             }
                         }
                     }
-                    
                 } catch (error) {
                     console.log(`Error en línea ${i}:`, error);
                     continue;
                 }
             }
             
-            // Convertir Set a Array y ordenar alfabéticamente
-            return Array.from(participantesSet).sort((a, b) => a.localeCompare(b));
+            // Convertir Set a Array y ordenar
+            const participantesArray = Array.from(participantesSet)
+                .filter(p => p && p.trim().length > 0)
+                .sort((a, b) => a.localeCompare(b));
+            
+            console.log(`Total participantes encontrados: ${participantesArray.length}`);
+            
+            return {
+                participantes: participantesArray,
+                plataforma: plataforma,
+                estadisticas: {
+                    totalFilas: lineas.length - 1, // Excluye encabezados
+                    filasValidas: filasValidas,
+                    columnasEncontradas: encabezados.length
+                }
+            };
         }
         
         function parseCSVLine(line) {
@@ -452,41 +764,56 @@
             return result;
         }
         
+        function mostrarEstadisticas(stats, plataforma) {
+            document.getElementById('totalCount').textContent = participantes.length;
+            document.getElementById('validRows').textContent = stats.filasValidas;
+            document.getElementById('platformUsed').textContent = plataforma.charAt(0);
+            
+            document.getElementById('platformUsed').parentElement.innerHTML = 
+                `<div class="stat-value">${plataforma.charAt(0)}</div>
+                 <div class="stat-label">${plataforma.toUpperCase()}</div>`;
+        }
+        
         function mostrarResultados(nombres) {
             document.getElementById('resultsSection').style.display = 'block';
-            document.getElementById('totalCount').textContent = nombres.length;
-            document.getElementById('uploadSuccess').textContent = 
-                `✅ Se encontraron ${nombres.length} participantes únicos`;
+            
+            const mensajeExito = `✅ Se encontraron ${nombres.length} participantes únicos de ${plataformaDetectada}`;
+            document.getElementById('uploadSuccess').textContent = mensajeExito;
             document.getElementById('uploadSuccess').style.display = 'block';
             
             // Mostrar lista
             const participantsList = document.getElementById('participantsList');
             participantsList.innerHTML = '';
             
-            const displayCount = Math.min(50, nombres.length);
+            const displayCount = Math.min(100, nombres.length);
             for (let i = 0; i < displayCount; i++) {
                 const div = document.createElement('div');
                 div.className = 'participant-item';
-                div.textContent = `${i + 1}. ${nombres[i]}`;
+                div.innerHTML = `<strong style="color: #8B0000;">${i + 1}.</strong> ${nombres[i]}`;
                 participantsList.appendChild(div);
             }
             
-            if (nombres.length > 50) {
+            if (nombres.length > 100) {
                 const div = document.createElement('div');
                 div.className = 'participant-item';
-                div.textContent = `... y ${nombres.length - 50} participantes más`;
+                div.style.textAlign = 'center';
                 div.style.fontStyle = 'italic';
-                div.style.color = '#666';
+                div.style.color = '#8B0000';
+                div.style.fontWeight = 'bold';
+                div.textContent = `... y ${nombres.length - 100} participantes más`;
                 participantsList.appendChild(div);
             }
             
             // Desplazar hacia la sección de resultados
-            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('resultsSection').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
         }
         
         function realizarSorteo() {
             if (!participantes.length) {
-                alert('No hay participantes para el sorteo');
+                alert('⚠️ No hay participantes para el sorteo');
                 return;
             }
             
@@ -498,11 +825,11 @@
             sorteoBtn.disabled = true;
             
             // Simular sorteo con delay dramático
-            let contador = 3;
+            let contador = 5;
             const intervalo = setInterval(() => {
                 if (contador > 0) {
                     document.querySelector('#sorteoLoading p').textContent = 
-                        `Seleccionando ganador... ${contador}`;
+                        `🎯 SELECCIONANDO GANADOR... ${contador}`;
                     contador--;
                 } else {
                     clearInterval(intervalo);
@@ -512,7 +839,7 @@
                     sorteoBtn.disabled = false;
                     mostrarGanador(ganador, participantes.length);
                 }
-            }, 500);
+            }, 600);
         }
         
         function mostrarGanador(ganador, total) {
@@ -523,55 +850,67 @@
             const winnerSection = document.getElementById('winnerSection');
             const winnerName = document.getElementById('winnerName');
             const winnerTotal = document.getElementById('winnerTotal');
+            const winnerPlatform = document.getElementById('winnerPlatform');
             
             winnerName.textContent = ganador;
             winnerTotal.textContent = total;
+            winnerPlatform.textContent = plataformaDetectada;
             winnerSection.style.display = 'block';
             
             // Desplazar hacia el ganador
-            winnerSection.scrollIntoView({ behavior: 'smooth' });
+            winnerSection.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'center'
+            });
             
             // Efecto de confeti
             crearConfeti();
         }
         
         function crearConfeti() {
-            // Efecto simple de confeti
-            for (let i = 0; i < 100; i++) {
+            // Efecto de confeti mejorado
+            for (let i = 0; i < 200; i++) {
                 setTimeout(() => {
                     const confetti = document.createElement('div');
                     confetti.style.position = 'fixed';
-                    confetti.style.width = Math.random() * 10 + 5 + 'px';
-                    confetti.style.height = Math.random() * 10 + 5 + 'px';
+                    confetti.style.width = Math.random() * 15 + 5 + 'px';
+                    confetti.style.height = Math.random() * 15 + 5 + 'px';
                     confetti.style.background = getRandomColor();
-                    confetti.style.borderRadius = '50%';
-                    confetti.style.top = '0';
+                    confetti.style.borderRadius = Math.random() > 0.7 ? '50%' : '0%';
+                    confetti.style.top = '-20px';
                     confetti.style.left = Math.random() * 100 + 'vw';
                     confetti.style.zIndex = '9999';
+                    confetti.style.opacity = '0.9';
                     document.body.appendChild(confetti);
                     
                     // Animación
                     const animation = confetti.animate([
-                        { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
-                        { transform: `translateY(${window.innerHeight}px) rotate(${360}deg)`, opacity: 0 }
+                        { 
+                            transform: 'translateY(0) rotate(0deg)', 
+                            opacity: 1 
+                        },
+                        { 
+                            transform: `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 720}deg)`, 
+                            opacity: 0 
+                        }
                     ], {
-                        duration: 1000 + Math.random() * 2000,
+                        duration: 2000 + Math.random() * 3000,
                         easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
                     });
                     
                     animation.onfinish = () => confetti.remove();
-                }, i * 30);
+                }, i * 20);
             }
         }
         
         function getRandomColor() {
-            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff9900', '#ff66cc'];
+            const colors = ['#8B0000', '#B22222', '#FFD700', '#DAA520', '#006400', '#0000FF', '#4B0082', '#FF6B6B', '#4ECDC4'];
             return colors[Math.floor(Math.random() * colors.length)];
         }
         
         function showError(mensaje) {
             const errorDiv = document.getElementById('uploadError');
-            errorDiv.textContent = mensaje;
+            errorDiv.innerHTML = `❌ ${mensaje}`;
             errorDiv.style.display = 'block';
         }
         
@@ -597,13 +936,15 @@
             });
             
             function highlight() {
-                uploadSection.style.background = '#f0f4ff';
-                uploadSection.style.borderColor = '#4a6ee0';
+                uploadSection.style.background = 'rgba(255, 215, 0, 0.1)';
+                uploadSection.style.borderColor = '#FFD700';
+                uploadSection.style.transform = 'scale(1.01)';
             }
             
             function unhighlight() {
                 uploadSection.style.background = '';
-                uploadSection.style.borderColor = '#667eea';
+                uploadSection.style.borderColor = '#8B0000';
+                uploadSection.style.transform = 'scale(1)';
             }
             
             uploadSection.addEventListener('drop', handleDrop, false);
@@ -616,10 +957,11 @@
                     const file = files[0];
                     if (file.name.toLowerCase().endsWith('.csv')) {
                         document.getElementById('csvFile').files = files;
-                        document.getElementById('fileName').textContent = `Archivo: ${file.name}`;
+                        document.getElementById('fileName').textContent = `📄 Archivo: ${file.name}`;
+                        mostrarVistaPrevia(file);
                         uploadFile();
                     } else {
-                        showError('Solo se permiten archivos CSV');
+                        showError('❌ Solo se permiten archivos CSV');
                     }
                 }
             }
@@ -627,4 +969,5 @@
     </script>
 </body>
 </html>
+
 
