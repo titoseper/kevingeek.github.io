@@ -625,6 +625,18 @@
             // DETECTAR PLATAFORMA
             let plataforma = '';
             let columnaVerificacion = -1;
+
+
+            // 2. DETECTAR TIKTOK (buscar TUXText 7)
+            if (!plataforma) {
+                for (let i = 0; i < encabezadosLower.length; i++) {
+                    if (encabezadosLower[i].includes('tiktokcomentarios')) {
+                        plataforma = 'TikTok';
+                        columnaVerificacion = i;
+                        break;
+                    }
+                }
+            }
             
             // 1. DETECTAR INSTAGRAM (buscar x1i10hfl)
             if (!plataforma) {
@@ -637,16 +649,7 @@
             }
         }
             
-            // 2. DETECTAR TIKTOK (buscar TUXText 7)
-            if (!plataforma) {
-                for (let i = 0; i < encabezadosLower.length; i++) {
-                    if (encabezadosLower[i].includes('tiktokcomentarios')) {
-                        plataforma = 'TikTok';
-                        columnaVerificacion = i;
-                        break;
-                    }
-                }
-            }
+            
             
             // 3. DETECTAR FACEBOOK (buscar xjp7ctv)
             if (!plataforma) {
@@ -966,6 +969,7 @@
     </script>
 </body>
 </html>
+
 
 
 
