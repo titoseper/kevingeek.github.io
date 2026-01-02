@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteo de Comentarios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4a6ee0 0%, #6a11cb 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .upload-section {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+        }
+        
+        .upload-section:hover {
+            background: #f8f9ff;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .file-input {
+            margin: 20px 0;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .results {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+        }
+        
+        .winner-section {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .winner-name {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .participants-list {
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .participant-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .participant-item:last-child {
+            border-bottom: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: none;
+        }
+        
+        .success {
+            color: #155724;
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 Sorteo de Comentarios</h1>
+            <p>Sube tu archivo CSV con los comentarios y realiza un sorteo aleatorio</p>
+        </div>
+        
+        <div class="content">
+            <div class="upload-section">
+                <div class="upload-icon">📁</div>
+                <h2>Subir Archivo CSV</h2>
+                <p>El archivo debe contener los comentarios del video (los nombres están en la clase _ap3a)</p>
+                
+                <div class="file-input">
+                    <input type="file" id="csvFile" accept=".csv" class="btn">
+                </div>
+                
+                <button id="uploadBtn" class="btn" onclick="uploadFile()">
+                    Subir y Procesar Archivo
+                </button>
+                
+                <div class="loading" id="uploadLoading">
+                    <div class="spinner"></div>
+                    <p>Procesando archivo...</p>
+                </div>
+                
+                <div class="error" id="uploadError"></div>
+            </div>
+            
+            <div class="results" id="resultsSection">
+                <div class="success" id="uploadSuccess"></div>
+                
+                <div id="participantsInfo">
+                    <h3>📋 Lista de Participantes</h3>
+                    <p>Total: <span id="totalCount">0</span> participantes</p>
+                    
+                    <div class="participants-list" id="participantsList">
+                        <!-- Los nombres se cargarán aquí -->
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <button id="sorteoBtn" class="btn" onclick="realizarSorteo()">
+                        🎉 Realizar Sorteo
+                    </button>
+                </div>
+                
+                <div class="loading" id="sorteoLoading">
+                    <div class="spinner"></div>
+                    <p>Realizando sorteo...</p>
+                </div>
+            </div>
+            
+            <div class="winner-section" id="winnerSection">
+                <h2>🎊 ¡GANADOR DEL SORTEO! 🎊</h2>
+                <div class="winner-name" id="winnerName"></div>
+                <p>De un total de <span id="winnerTotal">0</span> participantes</p>
+                <button class="btn" onclick="location.reload()" style="margin-top: 20px;">
+                    🔄 Nuevo Sorteo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let participantes = [];
+        
+        function uploadFile() {
+            const fileInput = document.getElementById('csvFile');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const loading = document.getElementById('uploadLoading');
+            const errorDiv = document.getElementById('uploadError');
+            const successDiv = document.getElementById('uploadSuccess');
+            
+            if (!fileInput.files.length) {
+                errorDiv.textContent = 'Por favor, selecciona un archivo CSV';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            
+            // Validar extensión
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                errorDiv.textContent = 'Solo se permiten archivos CSV';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Mostrar loading y ocultar errores
+            loading.style.display = 'block';
+            errorDiv.style.display = 'none';
+            uploadBtn.disabled = true;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                loading.style.display = 'none';
+                
+                if (data.error) {
+                    errorDiv.textContent = data.error;
+                    errorDiv.style.display = 'block';
+                    uploadBtn.disabled = false;
+                    return;
+                }
+                
+                // Guardar participantes
+                participantes = data.nombres;
+                
+                // Mostrar resultados
+                document.getElementById('resultsSection').style.display = 'block';
+                document.getElementById('totalCount').textContent = data.total_participantes;
+                document.getElementById('uploadSuccess').textContent = data.message;
+                document.getElementById('uploadSuccess').style.display = 'block';
+                
+                // Mostrar lista de participantes (solo primeros 50)
+                const participantsList = document.getElementById('participantsList');
+                participantsList.innerHTML = '';
+                
+                const displayCount = Math.min(50, participantes.length);
+                for (let i = 0; i < displayCount; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'participant-item';
+                    div.textContent = `${i + 1}. ${participantes[i]}`;
+                    participantsList.appendChild(div);
+                }
+                
+                if (participantes.length > 50) {
+                    const div = document.createElement('div');
+                    div.className = 'participant-item';
+                    div.textContent = `... y ${participantes.length - 50} participantes más`;
+                    div.style.fontStyle = 'italic';
+                    participantsList.appendChild(div);
+                }
+                
+                uploadBtn.disabled = false;
+            })
+            .catch(error => {
+                loading.style.display = 'none';
+                errorDiv.textContent = 'Error al subir el archivo: ' + error.message;
+                errorDiv.style.display = 'block';
+                uploadBtn.disabled = false;
+            });
+        }
+        
+        function realizarSorteo() {
+            const sorteoBtn = document.getElementById('sorteoBtn');
+            const loading = document.getElementById('sorteoLoading');
+            
+            if (!participantes.length) {
+                alert('No hay participantes para el sorteo');
+                return;
+            }
+            
+            // Mostrar loading
+            loading.style.display = 'block';
+            sorteoBtn.disabled = true;
+            
+            // Enviar participantes al servidor para el sorteo
+            fetch('/sorteo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nombres: participantes })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loading.style.display = 'none';
+                sorteoBtn.disabled = false;
+                
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
+                }
+                
+                // Mostrar ganador con efecto dramático
+                mostrarGanador(data.ganador, data.total_participantes);
+            })
+            .catch(error => {
+                loading.style.display = 'none';
+                sorteoBtn.disabled = false;
+                alert('Error al realizar el sorteo: ' + error.message);
+            });
+        }
+        
+        function mostrarGanador(ganador, total) {
+            // Ocultar sección de resultados
+            document.getElementById('resultsSection').style.display = 'none';
+            
+            // Mostrar sección de ganador
+            const winnerSection = document.getElementById('winnerSection');
+            const winnerName = document.getElementById('winnerName');
+            const winnerTotal = document.getElementById('winnerTotal');
+            
+            winnerName.textContent = ganador;
+            winnerTotal.textContent = total;
+            winnerSection.style.display = 'block';
+            
+            // Efecto de confeti visual
+            crearConfeti();
+        }
+        
+        function crearConfeti() {
+            // Efecto simple de confeti
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'fixed';
+                    confetti.style.width = '10px';
+                    confetti.style.height = '10px';
+                    confetti.style.background = getRandomColor();
+                    confetti.style.borderRadius = '50%';
+                    confetti.style.top = '0';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.zIndex = '9999';
+                    document.body.appendChild(confetti);
+                    
+                    // Animación
+                    const animation = confetti.animate([
+                        { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                        { transform: `translateY(${window.innerHeight}px) rotate(${360}deg)`, opacity: 0 }
+                    ], {
+                        duration: 1000 + Math.random() * 2000,
+                        easing: 'cubic-bezier(0.215, 0.610, 0.355, 1)'
+                    });
+                    
+                    animation.onfinish = () => confetti.remove();
+                }, i * 100);
+            }
+        }
+        
+        function getRandomColor() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        // Permitir arrastrar y soltar archivos
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadSection = document.querySelector('.upload-section');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadSection.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadSection.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadSection.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                uploadSection.style.background = '#f0f4ff';
+            }
+            
+            function unhighlight() {
+                uploadSection.style.background = '';
+            }
+            
+            uploadSection.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length && files[0].name.toLowerCase().endsWith('.csv')) {
+                    document.getElementById('csvFile').files = files;
+                    uploadFile();
+                } else {
+                    document.getElementById('uploadError').textContent = 'Solo se permiten archivos CSV';
+                    document.getElementById('uploadError').style.display = 'block';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
