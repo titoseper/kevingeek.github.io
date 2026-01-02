@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorteo de Comentarios</title>
+    <title>Sorteo de Comentarios - Red Dead Redemption 2</title>
     <style>
         * {
             margin: 0;
@@ -129,7 +129,7 @@
         }
         
         .participants-list {
-            max-height: 200px;
+            max-height: 300px;
             overflow-y: auto;
             background: white;
             border-radius: 5px;
@@ -139,7 +139,7 @@
         }
         
         .participant-item {
-            padding: 8px;
+            padding: 10px;
             border-bottom: 1px solid #eee;
         }
         
@@ -190,23 +190,30 @@
             color: #666;
             font-size: 14px;
         }
+        
+        .info-box {
+            background: #e8f4fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-         <div class="header">
-            <h1>🎬 Sorteo de Red Dead Redemption 2</h1>
-            <p>Solo participan los comentarios que etiquetanron a un amigo y agregaron algo más</p>
+        <div class="header">
+            <h1>🎬 Sorteo de Comentarios - Red Dead Redemption 2</h1>
+            <p>Solo participa un comentario por persona</p>
         </div>
-       
         
         <div class="content">
             <div class="upload-section">
                 <div class="upload-icon">📁</div>
                 <h2>Subir Archivo CSV</h2>
-                <p>El archivo debe contener los comentarios del video</p>
-                <p><small>Solo participa un comentario por persona</small></p>
                 
+                             
                 <div class="file-input">
                     <input type="file" id="csvFile" accept=".csv">
                     <div class="file-name" id="fileName"></div>
@@ -297,10 +304,10 @@
             reader.onload = function(e) {
                 try {
                     const contenido = e.target.result;
-                    participantes = procesarCSVLocalmente(contenido);
+                    participantes = procesarCSVSimple(contenido);
                     
                     if (participantes.length === 0) {
-                        showError('No se encontraron nombres en el archivo CSV. Asegúrate de que haya una columna con nombres.');
+                        showError('No se encontraron datos en las columnas especificadas.');
                         loading.style.display = 'none';
                         uploadBtn.disabled = false;
                         return;
@@ -311,7 +318,7 @@
                     uploadBtn.disabled = false;
                     
                 } catch (error) {
-                    showError('Error al leer el archivo: ' + error.message);
+                    showError('Error al procesar el archivo: ' + error.message);
                     loading.style.display = 'none';
                     uploadBtn.disabled = false;
                 }
@@ -326,70 +333,98 @@
             reader.readAsText(file, 'UTF-8');
         }
         
-        function procesarCSVLocalmente(csvText) {
-            const nombres = [];
+        function procesarCSVSimple(csvText) {
+            const participantesSet = new Set(); // Para evitar duplicados
             const lineas = csvText.split('\n').filter(linea => linea.trim() !== '');
             
-            if (lineas.length === 0) return nombres;
+            if (lineas.length === 0) return [];
             
-            // Encontrar encabezados
-            const encabezados = lineas[0].split(',').map(h => h.trim().toLowerCase());
-            let columnaNombre = -1;
+            // Obtener encabezados
+            const encabezados = parseCSVLine(lineas[0]).map(h => h.trim());
             
-            // Buscar columna con patrones comunes de nombres
-            const patrones = ['_ap3a', 'nombre', 'user', 'username', 'author', 'comentario', 'comment', 'css-j43fir-5e6d46e3--StyledUserLinkContent', 'xjp7ctv'];
+            // Buscar índices de las 3 columnas específicas
+            const columnasBuscadas = [
+                'x1i10hfl',
+                'css-j43fir-5e6d46e3--StyledUserLinkContent',
+                'xjp7ctv'
+            ];
             
-            for (let i = 0; i < encabezados.length; i++) {
-                for (const patron of patrones) {
-                    if (encabezados[i].includes(patron)) {
-                        columnaNombre = i;
+            const indicesEncontrados = [];
+            
+            // Buscar cada columna en los encabezados (búsqueda exacta o parcial)
+            for (const columnaBuscada of columnasBuscadas) {
+                for (let i = 0; i < encabezados.length; i++) {
+                    if (encabezados[i].includes(columnaBuscada)) {
+                        indicesEncontrados.push(i);
+                        console.log(`Encontrada columna: ${columnaBuscada} en índice ${i}`);
                         break;
                     }
                 }
-                if (columnaNombre !== -1) break;
             }
             
-            // Si no encontramos, usar la primera columna que parezca contener nombres
-            if (columnaNombre === -1) {
-                // Buscar en las primeras filas para deducir
-                for (let i = 0; i < Math.min(5, lineas.length); i++) {
-                    const columnas = lineas[i].split(',');
-                    for (let j = 0; j < columnas.length; j++) {
-                        const valor = columnas[j].trim();
-                        if (valor && valor.length > 1 && isNaN(valor) && !valor.includes('@')) {
-                            columnaNombre = j;
-                            break;
-                        }
+            // Si no encontramos ninguna columna, buscar de forma más flexible
+            if (indicesEncontrados.length === 0) {
+                // Buscar cualquier columna que contenga partes de los nombres
+                for (let i = 0; i < encabezados.length; i++) {
+                    const encabezado = encabezados[i].toLowerCase();
+                    if (encabezado.includes('x1i10hfl') || 
+                        encabezado.includes('css-j43fir') || 
+                        encabezado.includes('xjp7ctv') ||
+                        encabezado.includes('user') ||
+                        encabezado.includes('nombre') ||
+                        encabezado.includes('username')) {
+                        indicesEncontrados.push(i);
+                        console.log(`Encontrada columna alternativa: ${encabezados[i]} en índice ${i}`);
                     }
-                    if (columnaNombre !== -1) break;
                 }
             }
             
-            // Si aún no encontramos, usar primera columna
-            if (columnaNombre === -1) columnaNombre = 0;
+            // Ordenar índices para procesar en orden
+            indicesEncontrados.sort((a, b) => a - b);
             
-            // Procesar cada línea (empezando desde la segunda)
+            if (indicesEncontrados.length === 0) {
+                console.log('No se encontraron las columnas especificadas');
+                return [];
+            }
+            
+            // Procesar cada línea del CSV (empezando desde la fila 1)
             for (let i = 1; i < lineas.length; i++) {
                 try {
-                    // Manejar comas dentro de comillas
                     const columnas = parseCSVLine(lineas[i]);
-                    if (columnas[columnaNombre]) {
-                        const nombre = columnas[columnaNombre].trim().replace(/"/g, '');
-                        if (nombre && nombre.length > 1) {
-                            nombres.push(nombre);
+                    
+                    // Revisar cada columna buscada
+                    for (const indice of indicesEncontrados) {
+                        if (indice < columnas.length) {
+                            const valor = columnas[indice] ? columnas[indice].trim() : '';
+                            
+                            if (valor !== '' && valor.length > 1) {
+                                // Limpiar el valor (remover comillas extras, espacios)
+                                const nombreLimpio = valor
+                                    .replace(/^["']|["']$/g, '') // Remover comillas al inicio/fin
+                                    .replace(/^\s+|\s+$/g, '')   // Remover espacios
+                                    .replace(/^@/, '')           // Remover @ si existe al inicio
+                                    .slice(0, 100);              // Limitar longitud
+                                
+                                if (nombreLimpio && nombreLimpio.length > 0) {
+                                    participantesSet.add(nombreLimpio);
+                                    // Solo tomar el primer valor encontrado por fila
+                                    break;
+                                }
+                            }
                         }
                     }
-                } catch (e) {
-                    console.log('Error en línea', i, e);
+                    
+                } catch (error) {
+                    console.log(`Error en línea ${i}:`, error);
+                    continue;
                 }
             }
             
-            // Eliminar duplicados y ordenar alfabéticamente
-            return [...new Set(nombres)].sort((a, b) => a.localeCompare(b));
+            // Convertir Set a Array y ordenar alfabéticamente
+            return Array.from(participantesSet).sort((a, b) => a.localeCompare(b));
         }
         
         function parseCSVLine(line) {
-            // Manejo simple de CSV con comas dentro de comillas
             const result = [];
             let current = '';
             let inQuotes = false;
@@ -592,9 +627,3 @@
     </script>
 </body>
 </html>
-         
-
-
-
-
-
